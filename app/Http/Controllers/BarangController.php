@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Barang;
 
 class BarangController extends Controller
@@ -95,15 +96,32 @@ class BarangController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $b = Barang::findOrFail($id); // if (is_null($)) { return abort(404); }
+        return DB::transaction(
+            function () use ($request, $id) {
+                $b = Barang::findOrFail($id); // if (is_null($)) { return abort(404); }
+                // pessimistic locking
+                //$b = Barang::lockForUpdate()->findOrFail($id);
 
-        $b->update([
-            'nama' => $request->input('nama'),
-            'barcode' => $request->input('barcode'),
-            'satuan' => $request->input('satuan'),
-        ]);
+                // optimistic lock dengan cara check version masih sama
+                if ($b->version !== intval($request->input('version'))) {
+                    return redirect(route('barang.edit', $id))
+                        ->withErrors([
+                            'version' => 'Versi barang berubah, tolong refresh',
+                        ])
+                        ->withInput();
+                }
 
-        return redirect(route('barang.show', $id));
+                $b->update([
+                    'nama' => $request->input('nama'),
+                    'barcode' => $request->input('barcode'),
+                    'satuan' => $request->input('satuan'),
+                    'version' => $b->version + 1,
+                ]);
+
+                return redirect(route('barang.show', $id));
+            }
+        );
+
     }
 
     /**

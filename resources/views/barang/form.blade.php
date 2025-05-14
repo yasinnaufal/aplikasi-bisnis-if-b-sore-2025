@@ -14,6 +14,10 @@
                 <label for="satuan">Satuan:</label>
                 <x-input type="text" name="satuan" value="{{ $item->satuan}}" />
             </div>
+            <input type="text" name="version" value="{{ $item->version }}" />
+            @error('version')
+                <div class="text-red">{{ $errors->first('version') }}</div>
+            @enderror
             <div>
                 <x-input type="submit" value="Simpan" />
             </div>
