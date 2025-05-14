@@ -1,11 +1,6 @@
-<html>
-    <body>
+<x-layout>
         <h1>Detail Barang</h1>
-        <div>
-            <p>Nama: {{ $item->nama }}</p>
-            <p>Barcode: {{ $item->barcode  }} </p>
-            <p>Satuan: {{ $item->satuan  }}</p>
-        </div>
+        <x-barang :barang="$item" />
         <div>
             <button onclick="keHalamanEdit()">Edit</button>
             <button onclick="konfirmasiHapus();">
@@ -27,5 +22,4 @@
                 window.location = "{{ route('barang.edit', $item->id) }}";
             }
         </script>
-    </body>
-</html>
+</x-layout>

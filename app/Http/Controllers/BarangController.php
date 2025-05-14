@@ -15,12 +15,18 @@ class BarangController extends Controller
         $query = Barang::query();
 
         $q = $request->query('q');
+        $n = intval($request->query('n') ?? 3);
+        if ($n <= 0 || $n > 100) {
+            $n = 3;
+        }
 
         if (!is_null($q)) {
             $query = $query->where('nama', 'like', "%{$q}%");
         }
 
-        $items = $query->get();
+        //$items = $query->paginate(3);
+        $items = $query->orderBy('id')->cursorPaginate($n);
+
         return view('barang.index', ['items' => $items]);
     }
 
@@ -29,11 +35,13 @@ class BarangController extends Controller
      */
     public function create()
     {
-        return view('barang.form',
+        return view(
+            'barang.form',
             [
                 'action' => route('barang.store'),
                 'item' => new Barang()
-            ]);
+            ]
+        );
     }
 
     /**
@@ -73,11 +81,13 @@ class BarangController extends Controller
             return abort(404);
         }
 
-        return view('barang.form',
+        return view(
+            'barang.form',
             [
                 'action' => route('barang.update', $id),
                 'item' => $b
-            ]);
+            ]
+        );
     }
 
     /**

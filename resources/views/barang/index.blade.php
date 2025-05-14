@@ -1,14 +1,24 @@
-<html>
-    <body>
+<x-layout title="Aplikasi saya">
         <h1>Barang:</h1>
         <div>
             <a href="{{ route('barang.create') }}">Tambah Barang Baru</a>
         </div>
         <div>
             <form method="get" action="{{ route('barang.index') }}">
-                <input type="text" name="q" placeholder="Cari barang"
+                <x-input type="text" name="q" placeholder="Cari barang"
                     value="{{ app('request')->query('q') }}" />
-                <input type="submit" value="Filter" />
+                <select name="n">
+                    <option value="3" {{ request()->query('n') == 3 ? 'selected' : ''}}>
+                        3
+                    </option>
+                    <option value="5" {{ request()->query('n') == 5 ? 'selected' : ''}}>
+                        5
+                    </option>
+                    <option value="10" {{ request()->query('n') == 10 ? 'selected' : ''}}>
+                        10
+                    </option>
+                </select>
+                <x-input type="submit" value="Filter" />
             </form>
         </div>
         <table>
@@ -28,6 +38,11 @@
                 </td>
             </tr>
         @endforeach
+            <tr>
+                <td colspan="4">{{ $items->appends(request()->query())->links() }}</td>
+            </tr>
         </table>
-    </body>
-</html>
+</x-layout>
+
+
+
