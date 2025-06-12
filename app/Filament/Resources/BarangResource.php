@@ -71,7 +71,7 @@ class BarangResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\StocksRelationManager::class,
         ];
     }
 
