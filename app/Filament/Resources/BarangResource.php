@@ -58,6 +58,7 @@ class BarangResource extends Resource
                     ),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -79,6 +80,7 @@ class BarangResource extends Resource
         return [
             'index' => Pages\ListBarangs::route('/'),
             'create' => Pages\CreateBarang::route('/create'),
+            'view' => Pages\ViewBarang::route('/{record}'),
             'edit' => Pages\EditBarang::route('/{record}/edit'),
         ];
     }
