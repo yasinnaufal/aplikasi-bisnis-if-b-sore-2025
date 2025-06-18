@@ -6,8 +6,11 @@ use App\Filament\Resources\BarangResource\Pages;
 use App\Filament\Resources\BarangResource\RelationManagers;
 use App\Models\Barang;
 use Filament\Forms;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Model;
 
 class BarangResource extends Resource
 {
@@ -35,6 +39,17 @@ class BarangResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist->schema([
+            TextEntry::make('nama'),
+            TextEntry::make('barcode'),
+            TextEntry::make('totalStock')
+                ->numeric(locale: 'id')
+                ->suffix(fn ($record) => " {$record->satuan}"),
+        ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -46,7 +61,9 @@ class BarangResource extends Resource
                 TextColumn::make('barcode')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('satuan'),
+                TextColumn::make('totalStock')
+                    ->numeric(locale: 'id')
+                    ->suffix(fn (Model $record) => " {$record->satuan}"),
             ])
             ->filters([
                 SelectFilter::make('satuan')
@@ -65,7 +82,10 @@ class BarangResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->modifyQueryUsing(
+                fn (Builder $query) => $query->with(['stocks'])
+            );
     }
 
     public static function getRelations(): array
