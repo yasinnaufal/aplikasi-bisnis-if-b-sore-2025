@@ -13,13 +13,18 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class TransaksiStockResource extends Resource
 {
@@ -90,11 +95,44 @@ class TransaksiStockResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Action::make('row_action')
+                    ->action(
+                        function (Model $record) {
+                            Notification::make()
+                                ->title("Transaksi {$record->jenis->value}")
+                                ->info()
+                                ->send();
+                        }
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+                BulkAction::make('select_records')
+                    ->action(
+                        function (Collection $records) {
+                            Notification::make()
+                                ->title("{$records->count()} selected")
+                                ->info()
+                                ->send();
+                        }
+                    ),
+            ])
+            ->headerActions([
+                Action::make('hello')
+                    ->form([
+                        TextInput::make('nama')
+                            ->required(),
+                    ])
+                    ->action(
+                        function (array $data) {
+                            Notification::make()
+                                ->title("Hello {$data['nama']}")
+                                ->info()
+                                ->send();
+                        }
+                    ),
             ]);
     }
 
